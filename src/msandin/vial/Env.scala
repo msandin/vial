@@ -3,6 +3,15 @@ package msandin.vial
 class Ref[C](val env :Env[C], val content :C)
 
 
+private class Env2[C](
+    makeContent :Env2[C] => Seq[(Name, C)],
+    lookupExternal :(Name, Name) => Option[Ref[C]]) {
+  
+  private val content = makeContent(this)
+  
+}
+
+
 trait Env[C] {
   
   object ContentScope extends Scopes[Name, C, Ref[C]]
@@ -10,8 +19,7 @@ trait Env[C] {
   def scope :ContentScope.S
   
   def lookup(path :Path) :Option[Ref[C]]
-  
-  
+    
   def resolveDomain(domain :Domain[Path]) :Option[Domain[Ref[C]]] = {
     // this is a bit more... complicated... because at this point we need to construct a
     // env within which we should resolve the defs... which is kinds circular
@@ -37,6 +45,7 @@ trait Env[C] {
     }
   
 }
+
 
 
 class ExternalEnv[C](domain :Env[C]) extends Env[C] {
